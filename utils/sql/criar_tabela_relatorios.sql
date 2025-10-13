@@ -1,0 +1,22 @@
+CREATE TABLE relatorios (
+  id SERIAL PRIMARY KEY,
+  atendente VARCHAR(100),
+  data DATE,
+  atendimentos INTEGER,
+  indicacoes INTEGER,
+  avaliacoes INTEGER,
+  avaliacoes_convertidas INTEGER,
+  reavaliacoes INTEGER,
+  reavaliacoes_convertidas INTEGER,
+  agendamentos_dia INTEGER,
+  agendamentos_comparecidos INTEGER,
+  tours INTEGER,
+  contratos_recorrencia INTEGER,
+  quitacao_carne NUMERIC,
+  manutencoes INTEGER,
+  ortodontia_recorrente INTEGER,
+  vendas_planos_valor NUMERIC,
+  renegociacoes_qtd INTEGER,
+  renegociacoes_valor NUMERIC,
+  contas_recebidas NUMERIC
+);
