@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null)
+  const [weekly, setWeekly] = useState<any[]>([])
   const navigate = useNavigate()
   const { logout, user } = useAuth()
 
@@ -19,6 +20,16 @@ export default function Dashboard() {
       }
     }
     load()
+    // load weekly stats for assessoria
+    async function loadWeekly() {
+      try {
+        const res = await api.get('/reportStats/weekly?weeks=8')
+        setWeekly(res.data.data || [])
+      } catch (err) {
+        console.error('erro weekly', err)
+      }
+    }
+    loadWeekly()
   }, [])
 
   return (
@@ -45,6 +56,21 @@ export default function Dashboard() {
             <StatNumber>{stats ? stats.taxa_conversao_avaliacoes || '—' : '—'}</StatNumber>
           </Stat>
         </SimpleGrid>
+      )}
+      {user && user.role === 'assessoria' && (
+        <Box mt={6}>
+          <Heading size="md" mb={3}>Resumo semanal (últimas 8 semanas)</Heading>
+          <SimpleGrid columns={[1, 2, 4]} spacing={3}>
+            {weekly.map(w => (
+              <Box key={w.week_start} borderWidth={1} borderRadius="md" p={3}>
+                <Box fontSize="sm" color="gray.600">Semana de {w.week_start}</Box>
+                <Box fontWeight="bold" fontSize="lg">Atendimentos: {w.total_atendimentos}</Box>
+                <Box>Vendas: R$ {w.vendas_planos_valor.toFixed(2)}</Box>
+                <Box>Conversão: {w.taxa_conversao !== null ? (w.taxa_conversao * 100).toFixed(1) + '%' : '—'}</Box>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </Box>
       )}
     </Box>
   )
