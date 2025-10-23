@@ -66,7 +66,9 @@ export default function ReportView({ isOpen, onClose, report }: Props) {
                 </Tbody>
               </Table>
               <Box mt={4}>
-                <Button colorScheme="blue" isLoading={loading} onClick={loadWeekReports}>Ver relatórios da semana</Button>
+                {report.unit === 'Agregado semanal' && (
+                  <Button colorScheme="blue" isLoading={loading} onClick={loadWeekReports}>Ver relatórios da semana</Button>
+                )}
               </Box>
             </>
           ) : (
