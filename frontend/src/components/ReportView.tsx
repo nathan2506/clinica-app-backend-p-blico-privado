@@ -13,10 +13,13 @@ export default function ReportView({ isOpen, onClose, report }: Props) {
   const [showWeekDetails, setShowWeekDetails] = useState(false)
   const [weekReports, setWeekReports] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [showSelected, setShowSelected] = useState(false)
+  const [detailReport, setDetailReport] = useState<any | null>(null)
 
   if (!report) return null
 
-  async function loadWeekReports() {
+    async function loadWeekReports() {
     try {
       setLoading(true)
       const start = report.report_date
@@ -73,8 +76,49 @@ export default function ReportView({ isOpen, onClose, report }: Props) {
             </>
           ) : (
             <>
-              <Box mb={3}><Button size="sm" onClick={() => setShowWeekDetails(false)}>Voltar</Button></Box>
-              <ReportTable data={weekReports} onView={() => {}} onEdit={() => {}} onDelete={() => {}} />
+              <Box mb={3} display="flex" gap={3} alignItems="center">
+                <Button size="sm" onClick={() => setShowWeekDetails(false)}>Voltar</Button>
+                <Button size="sm" colorScheme="green" onClick={() => { setShowSelected(true) }} isDisabled={selectedIds.size === 0}>Visualizar selecionados</Button>
+                <Button size="sm" variant="ghost" onClick={() => { setSelectedIds(new Set()); setShowSelected(false) }}>Limpar seleção</Button>
+              </Box>
+
+              {/* Lista com checkboxes */}
+              <Table variant="simple">
+                <Tbody>
+                  <Tr>
+                    <Td></Td>
+                    <Td fontWeight="bold">Data</Td>
+                    <Td fontWeight="bold">Unidade</Td>
+                    <Td fontWeight="bold">Atendimentos</Td>
+                    <Td fontWeight="bold">Ações</Td>
+                  </Tr>
+                  {weekReports.map((r: any) => (
+                    <Tr key={r.id}>
+                      <Td>
+                        <input type="checkbox" checked={selectedIds.has(r.id)} onChange={(e) => {
+                          const copy = new Set(Array.from(selectedIds))
+                          if (e.target.checked) copy.add(r.id)
+                          else copy.delete(r.id)
+                          setSelectedIds(copy)
+                        }} />
+                      </Td>
+                      <Td>{r.report_date}</Td>
+                      <Td>{r.unit}</Td>
+                      <Td>{r.total_atendimentos}</Td>
+                      <Td>
+                        <Button size="sm" onClick={() => setDetailReport(r)}>Visualizar</Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+
+              {showSelected && (
+                <Box mt={4} borderTopWidth={1} pt={3}>
+                  <Box mb={2} fontWeight="bold">Relatórios selecionados</Box>
+                  <ReportTable data={weekReports.filter(w => selectedIds.has(w.id))} onView={(r:any)=>setDetailReport(r)} onEdit={() => {}} onDelete={() => {}} />
+                </Box>
+              )}
             </>
           )}
         </ModalBody>
