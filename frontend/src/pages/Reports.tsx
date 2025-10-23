@@ -5,10 +5,12 @@ import ReportForm from '../components/ReportForm'
 import UploadPreview from '../components/UploadPreview'
 import { useAuth } from '../contexts/AuthContext'
 import Calendar from '../components/Calendar'
+import ReportView from '../components/ReportView'
 
 export default function Reports() {
   const [data, setData] = useState<any[]>([])
   const [editing, setEditing] = useState<any | null>(null)
+  const [viewing, setViewing] = useState<any | null>(null)
   const [open, setOpen] = useState(false)
   const [meta, setMeta] = useState<any>(null)
   const [page, setPage] = useState(1)
@@ -49,6 +51,10 @@ export default function Reports() {
     setMeta({ page: 1, total: json.data.length, totalPages: 1 })
   }
 
+  function handleView(r: any) {
+    setViewing(r)
+  }
+
   function handleDeleted(id: number) {
     // after deletion just reload current page
     load(page)
@@ -68,7 +74,7 @@ export default function Reports() {
             <Button mb={4} colorScheme="teal" onClick={() => { setEditing(null); setOpen(true) }}>Novo relatório</Button>
           )}
           <UploadPreview />
-          <ReportTable data={data} onEdit={(r: any) => { setEditing(r); setOpen(true) }} onDelete={handleDeleted} />
+          <ReportTable data={data} onEdit={(r: any) => { setEditing(r); setOpen(true) }} onDelete={handleDeleted} onView={handleView} />
         </Box>
       </Box>
 
@@ -79,6 +85,7 @@ export default function Reports() {
       </Box>
 
       <ReportForm isOpen={open} onClose={() => setOpen(false)} onSaved={() => load(page)} initial={editing} />
+      <ReportView isOpen={!!viewing} onClose={() => setViewing(null)} report={viewing} />
     </Box>
   )
 }
